@@ -2,22 +2,41 @@
   "name": "webhook-catcher-backend",
   "version": "1.0.0",
   "description": "Webhook catcher backend API",
-  "main": "server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
+    "dev:debug": "ts-node-dev --inspect --respawn --transpile-only -r tsconfig-paths/register src/server.ts"
   },
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "pg": "^8.11.3",
-    "body-parser": "^1.20.2",
+    "typeorm": "^0.3.17",
     "uuid": "^9.0.1",
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "inversify": "^6.2.2",
+    "inversify-express-utils": "^6.4.3",
+    "reflect-metadata": "^0.1.13",
+    "pino": "^8.15.0",
+    "moment": "^2.29.4"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "pino-pretty": "^10.2.0",
+    "@types/express": "^4.17.17",
+    "@types/cors": "^2.8.13",
+    "@types/pg": "^8.10.2",
+    "@types/uuid": "^9.0.2",
+    "@types/helmet": "^4.0.0",
+    "@types/morgan": "^1.9.4",
+    "@types/node": "^20.5.0"
   }
 }

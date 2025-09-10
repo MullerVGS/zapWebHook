@@ -2,25 +2,28 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:15-alpine
     environment:
-      POSTGRES_DB: webhook_catcher
-      POSTGRES_USER: webhook_user
-      POSTGRES_PASSWORD: webhook_pass
+      - POSTGRES_DB=webhook_catcher
+      - POSTGRES_USER=webhook_user
+      - POSTGRES_PASSWORD=webhook_pass
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - webhook_network
+    restart: unless-stopped
 
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "3001:3001"
     environment:
       - NODE_ENV=development
+      - PORT=3001
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=webhook_catcher
@@ -31,22 +34,32 @@ services:
         condition: service_started
     restart: unless-stopped
     volumes:
-      - ./backend:/app
-      - /app/node_modules
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+      - ./backend/package-lock.json:/app/package-lock.json
+      - ./backend/tsconfig.json:/app/tsconfig.json
+      - ./backend/.env:/app/.env
     networks:
       - webhook_network
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3002:3000"
     environment:
       - REACT_APP_API_URL=http://localhost:3001
+    depends_on:
+      - backend
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/package-lock.json:/app/package-lock.json
     networks:
       - webhook_network
+    restart: unless-stopped
 
 volumes:
   postgres_data:

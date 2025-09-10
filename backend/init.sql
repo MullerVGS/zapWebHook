@@ -36,6 +36,4 @@ CREATE INDEX IF NOT EXISTS idx_webhook_endpoints_path ON webhook_endpoints(endpo
 INSERT INTO webhook_endpoints (name, endpoint_path, description, require_tls, require_auth) VALUES
 ('Default Webhook', '/webhook/default', 'Default webhook endpoint for testing', false, false),
 ('Secure Webhook', '/webhook/secure', 'Secure webhook with TLS requirement', true, false),
-('Authenticated Webhook', '/webhook/auth', 'Webhook requiring authentication', false, true, 'secret-token-123'),
-('Payment Webhook', '/webhook/payment', 'Payment processing webhook', true, true, 'payment-secret-456')
 ON CONFLICT (endpoint_path) DO NOTHING;
