@@ -12,42 +12,34 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - webhook_network
+      - admin_network
     restart: unless-stopped
 
   backend:
+    container_name: zap-webhook-backend
     build: 
       context: ./backend
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=webhook_catcher
-      - DB_USER=webhook_user
-      - DB_PASSWORD=webhook_pass
     depends_on:
       postgres:
         condition: service_started
     restart: unless-stopped
     volumes:
-      - ./backend/src:/app/src
-      - ./backend/package.json:/app/package.json
-      - ./backend/package-lock.json:/app/package-lock.json
-      - ./backend/tsconfig.json:/app/tsconfig.json
-      - ./backend/.env:/app/.env
+      - ./backend:/app
+      - /app/node_modules
+      - /app/dist
     networks:
-      - webhook_network
+      - admin_network
 
   frontend:
+    container_name: zap-webhook-frontend
     build: 
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3002:3000"
+      - "3420:3000"
     environment:
       - REACT_APP_API_URL=http://localhost:3001
     depends_on:
@@ -58,12 +50,12 @@ services:
       - ./frontend/package.json:/app/package.json
       - ./frontend/package-lock.json:/app/package-lock.json
     networks:
-      - webhook_network
+      - admin_network
     restart: unless-stopped
 
 volumes:
   postgres_data:
 
 networks:
-  webhook_network:
-    driver: bridge
+  admin_network:
+    external: true

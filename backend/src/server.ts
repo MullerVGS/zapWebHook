@@ -9,7 +9,7 @@ let server;
 
   server = app.express.listen(app.express.get('port'), function () {
     showMode();
-    pino.info(`Webhook Catcher Server running on port ${app.express.get('port')}`);
+    pino.info(`🚀 Webhook Catcher Server running on port ${app.express.get('port')}`);
   });
 
   // Setup graceful shutdown
