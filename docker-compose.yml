@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: webhook_catcher
+      POSTGRES_USER: webhook_user
+      POSTGRES_PASSWORD: webhook_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - webhook_network
+
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=webhook_catcher
+      - DB_USER=webhook_user
+      - DB_PASSWORD=webhook_pass
+    depends_on:
+      postgres:
+        condition: service_started
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - webhook_network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3002:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - webhook_network
+
+volumes:
+  postgres_data:
+
+networks:
+  webhook_network:
+    driver: bridge
