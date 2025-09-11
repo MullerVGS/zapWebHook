@@ -1,6 +1,9 @@
 import { AsyncContainerModule } from 'inversify';
 import TYPES from './types';
 
+// Services
+import CertificateValidationService from '@services/CertificateValidationService';
+
 // Repositories
 import IWebhookEndpointRepository from '@repositories/webhookEndpoint/IWebhookEndpointRepository';
 import WebhookEndpointRepository from '@repositories/webhookEndpoint/WebhookEndpointRepository';
@@ -20,6 +23,9 @@ import IFindWebhookRequestsUseCase from '@useCases/webhook/find/IFindWebhookRequ
 import FindWebhookRequestsUseCase from '@useCases/webhook/find/FindWebhookRequestsUseCase';
 
 export const bindings = new AsyncContainerModule(async (bind) => {
+    // Services
+    bind<CertificateValidationService>(TYPES.CertificateValidationService).to(CertificateValidationService);
+    
     // Repositories
     bind<IWebhookEndpointRepository>(TYPES.WebhookEndpointRepository).to(WebhookEndpointRepository);
     bind<IWebhookRequestRepository>(TYPES.WebhookRequestRepository).to(WebhookRequestRepository);

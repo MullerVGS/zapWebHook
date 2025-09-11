@@ -24,6 +24,9 @@ export class WebhookEndpoint {
     @Column({ type: 'varchar', length: 255, nullable: true })
     auth_token?: string;
 
+    @Column({ type: 'boolean', default: false })
+    require_certificate: boolean;
+
     @Column({ type: 'boolean', default: true })
     is_active: boolean;
 

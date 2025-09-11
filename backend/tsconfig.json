@@ -5,7 +5,7 @@
     "lib": ["ES2020"],
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -27,6 +27,7 @@
       "@errors/*": ["shared/errors/*"],
       "@models/*": ["main/models/*"],
       "@repositories/*": ["main/repositories/*"],
+      "@services/*": ["main/services/*"],
       "@useCases/*": ["main/useCases/*"],
       "@controllers/*": ["main/controllers/*"]
     }

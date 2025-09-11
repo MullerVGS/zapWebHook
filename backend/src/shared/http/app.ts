@@ -11,6 +11,7 @@ import helmet from 'helmet';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { DataSource } from "typeorm";
+import fs from 'fs';
 
 // Import controllers to register them
 import '@controllers/ApiController';
