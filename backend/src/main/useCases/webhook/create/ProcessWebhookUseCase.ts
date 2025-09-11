@@ -1,7 +1,6 @@
 import { WebhookRequest } from '@models/WebhookRequest';
 import IWebhookEndpointRepository from '@repositories/webhookEndpoint/IWebhookEndpointRepository';
 import IWebhookRequestRepository from '@repositories/webhookRequest/IWebhookRequestRepository';
-import CertificateValidationService from '@services/CertificateValidationService';
 import UseCaseError from '@errors/UseCaseError';
 import TYPES from '@types';
 import Pino from '@util/Pino';
@@ -15,9 +14,7 @@ export default class ProcessWebhookUseCase implements IProcessWebhookUseCase {
         @inject(TYPES.WebhookEndpointRepository)
         private readonly webhookEndpointRepository: IWebhookEndpointRepository,
         @inject(TYPES.WebhookRequestRepository)
-        private readonly webhookRequestRepository: IWebhookRequestRepository,
-        @inject(TYPES.CertificateValidationService)
-        private readonly certificateValidationService: CertificateValidationService
+        private readonly webhookRequestRepository: IWebhookRequestRepository
     ) {}
 
     public async execute(request: ProcessWebhookRequest): Promise<ProcessWebhookResponse> {
@@ -39,24 +36,6 @@ export default class ProcessWebhookUseCase implements IProcessWebhookUseCase {
                     title: "HTTPS obrigatório",
                     message: "HTTPS é obrigatório para este endpoint",
                     statusCode: 400
-                });
-            }
-
-            // Check certificate requirement
-            if (endpoint.require_certificate) {
-                const certValidation = this.certificateValidationService.validateFromHeaders(request.headers);
-                
-                if (!certValidation.isValid) {
-                    Pino.warn(`[ProcessWebhookUseCase] Certificate validation failed for endpoint ${endpoint.name}: ${certValidation.error}`);
-                    throw new UseCaseError({
-                        title: "Certificado inválido",
-                        message: "Certificado de cliente inválido ou não encontrado",
-                        statusCode: 401
-                    });
-                }
-
-                Pino.info(`[ProcessWebhookUseCase] Certificate validation successful for endpoint ${endpoint.name}`, {
-                    certificateInfo: certValidation.certificateInfo
                 });
             }
 

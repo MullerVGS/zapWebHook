@@ -27,7 +27,6 @@
       "@errors/*": ["shared/errors/*"],
       "@models/*": ["main/models/*"],
       "@repositories/*": ["main/repositories/*"],
-      "@services/*": ["main/services/*"],
       "@useCases/*": ["main/useCases/*"],
       "@controllers/*": ["main/controllers/*"]
     }
