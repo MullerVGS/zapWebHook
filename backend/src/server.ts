@@ -7,10 +7,19 @@ let server;
 (async () => {
   await app.configure();
 
-  server = app.express.listen(app.express.get('port'), function () {
-    showMode();
-    pino.info(`🚀 Webhook Catcher Server running on port ${app.express.get('port')}`);
-  });
+  // Use HTTPS server if available, otherwise fallback to HTTP
+  if (app.httpsServer) {
+    const httpsPort = process.env.HTTPS_PORT || 443;
+    server = app.httpsServer.listen(httpsPort, function () {
+      showMode();
+      pino.info(`🚀 Webhook Catcher HTTPS Server with mTLS running on port ${httpsPort}`);
+    });
+  } else {
+    server = app.express.listen(app.express.get('port'), function () {
+      showMode();
+      pino.info(`🚀 Webhook Catcher HTTP Server running on port ${app.express.get('port')}`);
+    });
+  }
 
   // Setup graceful shutdown
   setupGracefulShutdown();

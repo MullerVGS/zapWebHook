@@ -21,12 +21,17 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "3001:3001"
+      - "3001:3001"  # HTTP port for development/admin
+      - "443:443"    # HTTPS port for webhook mTLS
     restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - HTTPS_PORT=443
     volumes:
       - ./backend:/app
       - /app/node_modules
       - /app/dist
+      - ./backend/certs:/app/certs:ro  # Mount certificates as read-only
     networks:
       - admin_network
 
