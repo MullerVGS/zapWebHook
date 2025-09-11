@@ -11,9 +11,6 @@ import helmet from 'helmet';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { DataSource } from "typeorm";
-import fs from 'fs';
-import https from 'https';
-import path from 'path';
 
 // Import controllers to register them
 import '@controllers/ApiController';
@@ -21,7 +18,6 @@ import '@controllers/WebhookController';
 
 export class App {
     public express: express.Application;
-    public httpsServer: https.Server;
     private dataSource: DataSource;
     public container: Container;
     public static instance: App;
@@ -38,40 +34,12 @@ export class App {
         app.use(express.raw({ type: '*/*', limit: '10mb' }));
         app.use(requestLogger);
         
-        // Middleware para validação de certificado mTLS nos endpoints de webhook
-        app.use('/webhook', (req: any, res, next) => {
-            // Verifica se a requisição foi feita com certificado válido
-            if (req.socket && req.socket.authorized) {
-                next();
-            } else {
-                res.status(401).json({ 
-                    error: 'Certificado de cliente inválido ou não fornecido',
-                    message: 'mTLS authentication required' 
-                });
-            }
-        });
     }
 
     private errorHandler(app: express.Application): void {
         app.use(errorHandler);
     }
 
-    private getHttpsOptions(): https.ServerOptions {
-        const certsPath = path.join(__dirname, '../../../certs');
-        
-        return {
-            // Certificado SSL do domínio (fullchain.pem)
-            cert: fs.readFileSync(path.join(certsPath, 'fullchain.pem')),
-            // Chave privada do domínio
-            key: fs.readFileSync(path.join(certsPath, 'privkey.pem')),
-            // Certificado público da EfiPay para validação mTLS
-            ca: fs.readFileSync(path.join(certsPath, 'certificate-chain-prod.crt')),
-            // Configurações mTLS conforme documentação EfiPay
-            minVersion: 'TLSv1.2' as const,
-            requestCert: true,
-            rejectUnauthorized: false, // Mantém false para não rejeitar outros endpoints
-        };
-    }
 
     public async configure() {
         // Connect to database
@@ -101,15 +69,6 @@ export class App {
             timestamp: new Date().toISOString() 
         }));
 
-        // Configurar servidor HTTPS com mTLS
-        try {
-            const httpsOptions = this.getHttpsOptions();
-            this.httpsServer = https.createServer(httpsOptions, this.express);
-            console.log('HTTPS server configured with mTLS support');
-        } catch (error) {
-            console.warn('Failed to configure HTTPS server:', error);
-            console.log('Falling back to HTTP server');
-        }
     }
 
     public getDataSource(): DataSource {

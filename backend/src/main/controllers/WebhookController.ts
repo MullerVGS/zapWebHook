@@ -22,26 +22,27 @@ export class WebhookController {
     }
 
     private async processWebhook(req: Request, res: Response): Promise<Response> {
-        try {
-            const endpointPath = req.path;
-            
-            // Process the webhook request
-            const result = await this.processWebhookUseCase.execute({
-                endpointPath: `/webhook${endpointPath}`,
-                method: req.method,
-                url: req.originalUrl,
-                headers: req.headers as Record<string, any>,
-                queryParams: req.query as Record<string, any>,
-                body: req.body ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body)) : undefined,
-                contentType: req.headers['content-type'],
-                ipAddress: this.getClientIP(req),
-                userAgent: req.headers['user-agent']
-            });
-            
-            return res.status(200).json(result);
-        } catch (error) {
-            throw error;
-        }
+        const endpointPath = req.path;
+        
+        // Process the webhook request (never throws, always returns response)
+        const result = await this.processWebhookUseCase.execute({
+            endpointPath: `/webhook${endpointPath}`,
+            method: req.method,
+            url: req.originalUrl,
+            headers: req.headers as Record<string, any>,
+            queryParams: req.query as Record<string, any>,
+            body: req.body ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body)) : undefined,
+            contentType: req.headers['content-type'],
+            ipAddress: this.getClientIP(req),
+            userAgent: req.headers['user-agent']
+        });
+        
+        // Return response with the appropriate status code
+        return res.status(result.statusCode).json({
+            message: result.message,
+            endpoint: result.endpoint,
+            timestamp: result.timestamp
+        });
     }
 
     @httpGet('/*')

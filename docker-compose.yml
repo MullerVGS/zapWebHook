@@ -22,11 +22,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"  # HTTP port for development/admin
-      - "443:443"    # HTTPS port for webhook mTLS
+      # HTTPS port 8443 for internal mTLS (not exposed externally)
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - HTTPS_PORT=443
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -49,8 +46,6 @@ services:
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
-      - ./frontend/package.json:/app/package.json
-      - ./frontend/package-lock.json:/app/package-lock.json
     networks:
       - admin_network
     restart: unless-stopped

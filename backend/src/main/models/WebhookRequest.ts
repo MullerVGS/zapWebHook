@@ -33,6 +33,15 @@ export class WebhookRequest {
     @Column({ type: 'text', nullable: true })
     user_agent?: string;
 
+    @Column({ type: 'int', nullable: true })
+    response_status?: number;
+
+    @Column({ type: 'jsonb', nullable: true })
+    response_headers?: Record<string, any>;
+
+    @Column({ type: 'text', nullable: true })
+    response_body?: string;
+
     @CreateDateColumn()
     received_at: Date;
 

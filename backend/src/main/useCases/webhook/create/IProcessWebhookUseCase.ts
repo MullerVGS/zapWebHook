@@ -14,6 +14,7 @@ export interface ProcessWebhookResponse {
     message: string;
     endpoint: string;
     timestamp: string;
+    statusCode: number;
 }
 
 export default interface IProcessWebhookUseCase {
